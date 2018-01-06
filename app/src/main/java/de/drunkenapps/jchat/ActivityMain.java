@@ -9,17 +9,21 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
+import android.widget.Toast;
 
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.auth.UserProfileChangeRequest;
 
 public class ActivityMain extends AppCompatActivity {
 
     FirebaseAuth auth = FirebaseAuth.getInstance();
-    FirebaseUser user = auth.getCurrentUser();
+    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+    DataManager dataManager;
+
+    ListView chatsOverview;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,14 +33,18 @@ public class ActivityMain extends AppCompatActivity {
             Intent intent = new Intent(this.getApplicationContext(), ActivityLogin.class);
             startActivity(intent);
             finish();
+            return;
         }
 
+        if (user.getDisplayName().equals("")){
+            user.updateProfile(new UserProfileChangeRequest.Builder().setDisplayName("anon").build());
+        }
 
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -44,6 +52,15 @@ public class ActivityMain extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+
+        dataManager = DataManager.getInstance(this);
+        chatsOverview = findViewById(R.id.chats_overview_listview);
+
+        chatsOverview.setAdapter(dataManager.getListAdapter());
+
+        Intent intent = new Intent(this, ActivityChat.class);
+        startActivity(intent);
     }
 
     @Override
@@ -61,14 +78,20 @@ public class ActivityMain extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.menu_settings) {
             return true;
         }
         if (id == R.id.menu_signout){
             auth.signOut();
+            DataManager.dropInstance();
             finish();
+        }
+        if (id == R.id.menu_showcurrentuser){
+            Toast.makeText(this.getApplicationContext(), user.getUid(), Toast.LENGTH_LONG).show();
         }
 
         return super.onOptionsItemSelected(item);
     }
+
+
 }

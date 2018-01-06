@@ -21,4 +21,8 @@
     <string name="login_string_switcher_tologin">Already have an account? Click me</string>
     <string name="login_string_password">Password</string>
     <string name="login_string_username">Username</string>
+    <string name="chat_send">send</string>
+    <string name="chat_message">Message</string>
+    <string name="login_string_toggle_anonymous">anonymous</string>
+    <string name="login_string_toggle_credentials">credentials</string>
 </resources>
