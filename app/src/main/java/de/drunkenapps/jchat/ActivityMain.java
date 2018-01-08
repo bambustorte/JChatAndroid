@@ -1,6 +1,9 @@
 package de.drunkenapps.jchat;
 
 import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -46,55 +49,62 @@ public class ActivityMain extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final Intent intent = new Intent(ActivityMain.this, ActivityJoinCreateGroup.class);
+            final Intent intent = new Intent(ActivityMain.this, ActivityJoinCreateGroup.class);
 
-                new AlertDialog.Builder(ActivityMain.this)
-                        .setTitle("vla")
-                        .setMessage("tut")
-                        .setPositiveButton("join", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                intent.putExtra("type", 1);
-                                startActivity(intent);
-                            }
-                        })
-                        .setNegativeButton("create", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                intent.putExtra("type", 2);
-                                startActivity(intent);
-                            }
-                        })
-                        .show();
+            new AlertDialog.Builder(ActivityMain.this)
+                .setTitle("vla")
+                .setMessage("tut")
+                .setPositiveButton("join", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        intent.putExtra("type", 1);
+                        startActivity(intent);
+                    }
+                })
+                .setNegativeButton("create", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        intent.putExtra("type", 2);
+                        startActivity(intent);
+                    }
+                })
+                .show();
             }
         });
-
+        fab.setVisibility(View.INVISIBLE);
 
         dataManager = DataManager.getInstance(this);
         groupsOverview = findViewById(R.id.chats_overview_listview);
 
-//        ArrayList<String> strings = new ArrayList<>();
-//        strings.add("test");
-//        strings.add("test");
-//        strings.add("test");
-//        strings.add("test");
-//        strings.add("test");
-//        strings.add("test");
-//        strings.add("test");
-
-        Log.d("test", dataManager.getGroups().toString());
         groupsOverview.setAdapter(dataManager.getGroupAdapter());//new MyGroupAdapter(ActivityMain.this, R.layout.list_entry, dataManager.getGroups()));
         Log.d("test2", groupsOverview.getAdapter().toString());
 
         groupsOverview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(ActivityMain.this, ActivityChat.class);
-                intent.putExtra("groupId", dataManager.getGroups().get(position).getGroupId());
-                startActivity(intent);
+            Intent intent = new Intent(ActivityMain.this, ActivityChat.class);
+            intent.putExtra("groupId", dataManager.getGroups().get(position).getGroupId());
+            startActivity(intent);
             }
         });
-        Log.d("test3", dataManager.getGroups().toString());
+
+        groupsOverview.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData clip = ClipData.newPlainText(
+                "copiedChat",
+                ((Group) parent.getItemAtPosition(position)).getGroupId());
+            if (clipboard != null) {
+                clipboard.setPrimaryClip(clip);
+                Toast.makeText(ActivityMain.this, R.string.groupId_copied, Toast.LENGTH_SHORT).show();
+                return true;
+            }
+            return false;
+            }
+        });
+
+        Log.d("test", dataManager.getGroups().toString());
 
     }
 
@@ -117,7 +127,7 @@ public class ActivityMain extends AppCompatActivity {
             return true;
         }
         if (id == R.id.menu_refresh) {
-            update(null);
+            update();
             return true;
         }
         if (id == R.id.menu_signout){
@@ -135,7 +145,7 @@ public class ActivityMain extends AppCompatActivity {
     }
 
 
-    public void update(View v){
+    public void update(){
         dataManager.updateAll();
     }
 }

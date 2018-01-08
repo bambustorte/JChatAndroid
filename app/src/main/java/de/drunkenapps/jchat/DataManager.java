@@ -172,7 +172,7 @@ class DataManager {
                 }
 
                 if ( dataSnapshot.hasChild("policy")
-                                && ( (String) dataSnapshot.child("policy").getValue() ).equals("private") ){
+                                && dataSnapshot.child("policy").getValue().equals("private") ){
                     returnResult[0] = 3;
                     return;
                 }
@@ -247,6 +247,15 @@ class DataManager {
 
         for (AdapterForChats adapterForChats: chatAdapters){
             adapterForChats.notifyDataSetChanged();
+        }
+    }
+
+    void test(){
+        try{
+            Thread.currentThread().sleep(1000);
+        }
+        catch(Exception e){
+            e.printStackTrace();
         }
     }
 }
