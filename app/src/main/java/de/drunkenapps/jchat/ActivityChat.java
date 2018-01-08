@@ -38,6 +38,6 @@ public class ActivityChat extends AppCompatActivity {
         }
         dataManager.pushMessage(new Message(textField.getText().toString(), user.getUid(), new Date().getTime(), user.getDisplayName()));
         textField.setText("");
-        listView.setSelection(dataManager.getLastIndex());
+        listView.setSelection(dataManager.getLastMessagesIndex());
     }
 }

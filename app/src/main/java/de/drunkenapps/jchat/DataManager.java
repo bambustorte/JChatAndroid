@@ -91,7 +91,7 @@ class DataManager {
         return listAdapters.get(listAdapters.size() - 1);
     }
 
-    int getLastIndex(){
+    int getLastMessagesIndex(){
         return messages.size() - 1;
     }
 }

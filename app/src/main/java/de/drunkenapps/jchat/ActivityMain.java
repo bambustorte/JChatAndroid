@@ -9,12 +9,16 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+
+import java.util.ArrayList;
 
 public class ActivityMain extends AppCompatActivity {
 
@@ -48,8 +52,8 @@ public class ActivityMain extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Intent intent = new Intent(ActivityMain.this, ActivityChat.class);
+                startActivity(intent);
             }
         });
 
@@ -57,10 +61,23 @@ public class ActivityMain extends AppCompatActivity {
         dataManager = DataManager.getInstance(this);
         chatsOverview = findViewById(R.id.chats_overview_listview);
 
-        chatsOverview.setAdapter(dataManager.getListAdapter());
+        ArrayList<String> strings = new ArrayList<>();
+        strings.add("test");
+        strings.add("test");
+        strings.add("test");
+        strings.add("test");
+        strings.add("test");
+        strings.add("test");
+        strings.add("test");
+        chatsOverview.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, strings));
+        chatsOverview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(ActivityMain.this, ActivityChat.class);
+                startActivity(intent);
+            }
+        });
 
-        Intent intent = new Intent(this, ActivityChat.class);
-        startActivity(intent);
     }
 
     @Override
