@@ -40,10 +40,6 @@ public class ActivityMain extends AppCompatActivity {
             return;
         }
 
-        if (user.getDisplayName().equals("")){
-            user.updateProfile(new UserProfileChangeRequest.Builder().setDisplayName("anon").build());
-        }
-
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

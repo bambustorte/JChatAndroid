@@ -115,6 +115,7 @@ public class ActivityLogin extends AppCompatActivity {
                         String newUserName = editTextUsername.getText().toString();
                         if (newUserName.equals("")){
                             newUserName = "anon";
+                            newUserName += "#" +  (int)(Math.random()*100000);
                         }
                         user = FirebaseAuth.getInstance().getCurrentUser();
                         user.updateProfile(
@@ -142,11 +143,11 @@ public class ActivityLogin extends AppCompatActivity {
         if (toggleButton.isChecked()){
             editTextPassword.setEnabled(false);
             editTextUserEmail.setEnabled(false);
-            editTextUsername.setVisibility(View.VISIBLE);
+//            editTextUsername.setVisibility(View.VISIBLE);
         } else {
             editTextPassword.setEnabled(true);
             editTextUserEmail.setEnabled(true);
-            editTextUsername.setVisibility(View.INVISIBLE);
+//            editTextUsername.setVisibility(View.INVISIBLE);
         }
     }
 
