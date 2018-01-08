@@ -4,10 +4,13 @@
     tools:context="de.drunkenapps.jchat.ActivityMain">
     <item
         android:id="@+id/menu_showcurrentuser"
-        android:title="show current user" />
+        android:title="@string/menu_show_current_user" />
     <item
         android:id="@+id/menu_signout"
-        android:title="sign out" />
+        android:title="@string/menu_sign_out" />
+    <item
+        android:id="@+id/menu_refresh"
+        android:title="@string/menu_refresh" />
     <item
         android:id="@+id/menu_settings"
         android:orderInCategory="100"

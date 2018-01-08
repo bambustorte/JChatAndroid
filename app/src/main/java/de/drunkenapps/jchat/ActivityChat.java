@@ -15,6 +15,7 @@ public class ActivityChat extends AppCompatActivity {
 
     EditText textField;
     ListView listView;
+    String groupId;
 
     DataManager dataManager;
 
@@ -25,18 +26,20 @@ public class ActivityChat extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
+        groupId = getIntent().getStringExtra("groupId");
+
         dataManager = DataManager.getInstance(this);
         textField = findViewById(R.id.chat_messagefield);
         listView = findViewById(R.id.chat_chats_listview);
 
-        listView.setAdapter(dataManager.getListAdapter());
+        listView.setAdapter(dataManager.getChatAdapter(groupId));
     }
 
     public void sendButtonClicked(View v){
         if (textField.getText().toString().equals("")) {
             return;
         }
-        dataManager.pushMessage(new Message(textField.getText().toString(), user.getUid(), new Date().getTime(), user.getDisplayName()));
+        dataManager.pushMessage(groupId, new Message(textField.getText().toString(), user.getUid(), new Date().getTime(), user.getDisplayName()));
         textField.setText("");
 
         //Fixme: does not work

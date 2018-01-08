@@ -25,4 +25,11 @@
     <string name="chat_message">Message</string>
     <string name="login_string_toggle_anonymous">anonymous</string>
     <string name="login_string_toggle_credentials">credentials</string>
+    <string name="create_join_group_join">Join</string>
+    <string name="create_join_group_create">Create</string>
+    <string name="create_join_group_groupid">Group ID</string>
+    <string name="create_join_group_groupname">Group name</string>
+    <string name="menu_refresh">refresh</string>
+    <string name="menu_sign_out">sign out</string>
+    <string name="menu_show_current_user">show current user</string>
 </resources>

@@ -1,24 +1,22 @@
 package de.drunkenapps.jchat;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
-
-import java.util.ArrayList;
 
 public class ActivityMain extends AppCompatActivity {
 
@@ -27,7 +25,7 @@ public class ActivityMain extends AppCompatActivity {
 
     DataManager dataManager;
 
-    ListView chatsOverview;
+    ListView groupsOverview;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,31 +46,55 @@ public class ActivityMain extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(ActivityMain.this, ActivityChat.class);
-                startActivity(intent);
+                final Intent intent = new Intent(ActivityMain.this, ActivityJoinCreateGroup.class);
+
+                new AlertDialog.Builder(ActivityMain.this)
+                        .setTitle("vla")
+                        .setMessage("tut")
+                        .setPositiveButton("join", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                intent.putExtra("type", 1);
+                                startActivity(intent);
+                            }
+                        })
+                        .setNegativeButton("create", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                intent.putExtra("type", 2);
+                                startActivity(intent);
+                            }
+                        })
+                        .show();
             }
         });
 
 
         dataManager = DataManager.getInstance(this);
-        chatsOverview = findViewById(R.id.chats_overview_listview);
+        groupsOverview = findViewById(R.id.chats_overview_listview);
 
-        ArrayList<String> strings = new ArrayList<>();
-        strings.add("test");
-        strings.add("test");
-        strings.add("test");
-        strings.add("test");
-        strings.add("test");
-        strings.add("test");
-        strings.add("test");
-        chatsOverview.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, strings));
-        chatsOverview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//        ArrayList<String> strings = new ArrayList<>();
+//        strings.add("test");
+//        strings.add("test");
+//        strings.add("test");
+//        strings.add("test");
+//        strings.add("test");
+//        strings.add("test");
+//        strings.add("test");
+
+        Log.d("test", dataManager.getGroups().toString());
+        groupsOverview.setAdapter(dataManager.getGroupAdapter());//new MyGroupAdapter(ActivityMain.this, R.layout.list_entry, dataManager.getGroups()));
+        Log.d("test2", groupsOverview.getAdapter().toString());
+
+        groupsOverview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(ActivityMain.this, ActivityChat.class);
+                intent.putExtra("groupId", dataManager.getGroups().get(position).getGroupId());
                 startActivity(intent);
             }
         });
+        Log.d("test3", dataManager.getGroups().toString());
 
     }
 
@@ -94,10 +116,16 @@ public class ActivityMain extends AppCompatActivity {
         if (id == R.id.menu_settings) {
             return true;
         }
+        if (id == R.id.menu_refresh) {
+            update(null);
+            return true;
+        }
         if (id == R.id.menu_signout){
             auth.signOut();
             DataManager.dropInstance();
             finish();
+            Intent intent = new Intent(ActivityMain.this, ActivityMain.class);
+            startActivity(intent);
         }
         if (id == R.id.menu_showcurrentuser){
             Toast.makeText(this.getApplicationContext(), user.getUid(), Toast.LENGTH_LONG).show();
@@ -107,4 +135,7 @@ public class ActivityMain extends AppCompatActivity {
     }
 
 
+    public void update(View v){
+        dataManager.updateAll();
+    }
 }

@@ -18,14 +18,14 @@ import java.util.Locale;
  * @date 1/6/18.
  */
 
-public class AdapterForChats extends ArrayAdapter<Message> {
+public class AdapterForGroups extends ArrayAdapter<Group> {
 
     private final LayoutInflater inflater;
     private final int resourceId;
     private SimpleDateFormat simpleDateFormat;
 
-    AdapterForChats(Context context, final int resourceId, ArrayList<Message> messages) {
-        super(context, resourceId, messages);
+    AdapterForGroups(Context context, final int resourceId, ArrayList<Group> items) {
+        super(context, resourceId, items);
 
         this.resourceId = resourceId;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -42,14 +42,13 @@ public class AdapterForChats extends ArrayAdapter<Message> {
         TextView messageText = convertView.findViewById(R.id.list_view_entry_message);
         TextView messageDate = convertView.findViewById(R.id.list_view_entry_timestamp);
 
+        Group group = getItem(position);
 
-        Message message = getItem(position);
-
-        messageUsername.setText(message.getUsername());
-        messageText.setText(message.getMessage());
+        messageUsername.setText(group.getName());
+        messageText.setText(group.getLastMessage());
         messageDate.setText(
                 simpleDateFormat.format(
-                        new Date(message.getTimestamp())
+                        new Date(group.getLastTimestamp())
                 )
         );
 
