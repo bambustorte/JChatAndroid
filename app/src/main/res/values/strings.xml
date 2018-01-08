@@ -32,4 +32,6 @@
     <string name="menu_refresh">refresh</string>
     <string name="menu_sign_out">sign out</string>
     <string name="menu_show_current_user">show current user</string>
+    <string name="chats_message_copied">Message copied!</string>
+    <string name="groupId_copied">groupId copied!</string>
 </resources>
