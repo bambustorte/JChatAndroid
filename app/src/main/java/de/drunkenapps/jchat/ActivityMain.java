@@ -57,8 +57,8 @@ public class ActivityMain extends AppCompatActivity {
             final Intent intent = new Intent(ActivityMain.this, ActivityJoinCreateGroup.class);
 
             new AlertDialog.Builder(ActivityMain.this)
-                .setTitle("vla")
-                .setMessage("tut")
+                .setTitle("vla")//fixme
+                .setMessage("tut")//fixme
                 .setPositiveButton("join", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -81,7 +81,7 @@ public class ActivityMain extends AppCompatActivity {
         groupsOverview = findViewById(R.id.chats_overview_listview);
 
         groupsOverview.setAdapter(dataManager.getGroupAdapter());//new MyGroupAdapter(ActivityMain.this, R.layout.list_entry, dataManager.getGroups()));
-        Log.d("test2", groupsOverview.getAdapter().toString());
+//        Log.d("test2", groupsOverview.getAdapter().toString());
 
         groupsOverview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -95,20 +95,21 @@ public class ActivityMain extends AppCompatActivity {
         groupsOverview.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-            ClipData clip = ClipData.newPlainText(
-                "copiedChat",
-                ((Group) parent.getItemAtPosition(position)).getGroupId());
-            if (clipboard != null) {
-                clipboard.setPrimaryClip(clip);
-                Toast.makeText(ActivityMain.this, R.string.groupId_copied, Toast.LENGTH_SHORT).show();
-                return true;
-            }
-            return false;
+                ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clip = ClipData.newPlainText(
+                    "copiedChat",
+                    ((Group) parent.getItemAtPosition(position)).getGroupId());
+                Log.d("test", ((Group) parent.getItemAtPosition(position)).getGroupId());
+                if (clipboard != null) {
+                    clipboard.setPrimaryClip(clip);
+                    Toast.makeText(ActivityMain.this, R.string.groupId_copied, Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+                return false;
             }
         });
 
-        Log.d("test", dataManager.getGroups().toString());
+//        Log.d("test", dataManager.getGroups().toString());
 
     }
 
@@ -146,6 +147,7 @@ public class ActivityMain extends AppCompatActivity {
         }
         if (id == R.id.menu_showcurrentuser){
             Toast.makeText(this.getApplicationContext(), user.getUid(), Toast.LENGTH_LONG).show();
+            Log.d("test", user.getUid());
         }
 
         return super.onOptionsItemSelected(item);

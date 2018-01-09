@@ -1,7 +1,11 @@
 package de.drunkenapps.jchat;
 
-import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
 import android.content.Context;
+import android.content.Intent;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 
@@ -25,7 +29,6 @@ class DataManager {
     private static DataManager instance = null;
 
     private ArrayList<Group> groups;
-    private ArrayList<Message> messages;
     private Context context;
     private ArrayList<AdapterForChats> chatAdapters;
     private ArrayList<AdapterForGroups> groupAdapters;
@@ -39,43 +42,9 @@ class DataManager {
     private DataManager(final Context context){
         this.context = context;
 
-        messages = new ArrayList<>();
         groups = new ArrayList<>();
         chatAdapters = new ArrayList<>();
         groupAdapters = new ArrayList<>();
-
-//        userRootNode.child("messages").addChildEventListener(new ChildEventListener() {
-//            @Override
-//            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-//                messages.add(0, dataSnapshot.getValue(Message.class));
-//                for (MyAdapter listadapter :
-//                        chatAdapters) {
-//                    listadapter.notifyDataSetChanged();
-//                }
-//            }
-//
-//            @Override
-//            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-//
-//            }
-//
-//            @Override
-//            public void onChildRemoved(DataSnapshot dataSnapshot) {
-//
-//            }
-//
-//            @Override
-//            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        });
-
-
 
         userRootNode.child("groups").addChildEventListener(new MyChildEventListener() {
             @Override
@@ -118,13 +87,31 @@ class DataManager {
                                     for (ArrayAdapter chatAdapter : chatAdapters) {
                                         chatAdapter.notifyDataSetChanged();
                                     }
-                                    new Notification.Builder(context)
+                                    NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "channel")
                                             .setContentTitle("title")
                                             .setContentText("text")
-                                            .setSmallIcon(R.mipmap.icon)
-                                            .build();
+                                            .setSmallIcon(R.mipmap.icon);
+                                    Intent resultIntent = new Intent(context, ActivityChat.class);
+
+                                    TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+
+                                    stackBuilder.addParentStack(ActivityChat.class);
+
+                                    stackBuilder.addNextIntent(resultIntent);
+                                    PendingIntent resultPendingIntent =
+                                            stackBuilder.getPendingIntent(
+                                                    0,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT
+                                            );
+                                    builder.setContentIntent(resultPendingIntent);
+
+                                    NotificationManager notificationManager =
+                                            (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                                    notificationManager.notify(0, builder.build());
+
                                 }
                             });
+                            return;
                         }
                     }
                 });

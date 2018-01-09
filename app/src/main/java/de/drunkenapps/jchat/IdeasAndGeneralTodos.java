@@ -13,4 +13,6 @@ abstract class IdeasAndGeneralTodos {
 
 
     //Todo: add every user to the public group chat
+
+    //Todo: go through whole code and replace strings with useful information
 }
