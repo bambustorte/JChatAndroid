@@ -18,7 +18,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
@@ -136,6 +135,9 @@ public class ActivityMain extends AppCompatActivity {
             return true;
         }
         if (id == R.id.menu_signout){
+//            DataManager.getInstance(ActivityMain.this).deleteUserData();
+            if (user.isAnonymous())
+                user.delete();
             auth.signOut();
             DataManager.dropInstance();
             finish();
