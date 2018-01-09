@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -18,6 +19,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * @author max
@@ -49,72 +51,93 @@ class DataManager {
         userRootNode.child("groups").addChildEventListener(new MyChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                final String groupId = dataSnapshot.getKey();
+            final String groupId = dataSnapshot.getKey();
 
-                final DatabaseReference referenceToGroup = rootNode.child("groups").child(groupId);
+            final DatabaseReference referenceToGroup = rootNode.child("groups").child(groupId);
 
-                Log.d("test", "groupId = " + groupId);
+            Log.d("test", "groupId = " + groupId
+                    + ", path to group: " + referenceToGroup.toString());
 
-                final String[] groupName = {""};
+            final String[] groupName = {""};
 
-                referenceToGroup.child("info").addChildEventListener(new MyChildEventListener() {
-                    @Override
-                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        if (dataSnapshot.getKey().equals("name")) {
-
-                            groupName[0] = (String) dataSnapshot.getValue();
-
-                            groups.add(
-                                    new Group(
-                                            referenceToGroup,
-                                            groupName[0],
-                                            groupId
-                                    )
-                            );
-
-                            for (ArrayAdapter groupAdapter : groupAdapters) {
-                                groupAdapter.notifyDataSetChanged();
-                            }
-
-                            Log.d("test", "groupName = " + groupName[0]);
-
-                            final Group group = groups.get(groups.size()-1);
-
-                            group.getDatabaseReference().child("messages").addChildEventListener(new MyChildEventListener() {
-                                @Override
-                                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                                    group.addMessage(dataSnapshot.getValue(Message.class));
-                                    for (ArrayAdapter chatAdapter : chatAdapters) {
-                                        chatAdapter.notifyDataSetChanged();
-                                    }
-                                    NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "channel")
-                                            .setContentTitle("title")
-                                            .setContentText("text")
-                                            .setSmallIcon(R.mipmap.icon);
-                                    Intent resultIntent = new Intent(context, ActivityChat.class);
-
-                                    TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-
-                                    stackBuilder.addParentStack(ActivityChat.class);
-
-                                    stackBuilder.addNextIntent(resultIntent);
-                                    PendingIntent resultPendingIntent =
-                                            stackBuilder.getPendingIntent(
-                                                    0,
-                                                    PendingIntent.FLAG_UPDATE_CURRENT
-                                            );
-                                    builder.setContentIntent(resultPendingIntent);
-
-                                    NotificationManager notificationManager =
-                                            (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                                    notificationManager.notify(0, builder.build());
-
-                                }
-                            });
-                            return;
-                        }
+            referenceToGroup.addChildEventListener(new MyChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    if (!dataSnapshot.getKey().equals("info")){
+                        return;
                     }
-                });
+
+                    if (!dataSnapshot.child("name").exists()) {
+                        Log.d("test", "name does not exist, key was: " + referenceToGroup.getKey());
+                        return;
+                    }
+
+                    groupName[0] = (String) dataSnapshot.child("name").getValue();
+
+                    groups.add(
+                        new Group(
+                                referenceToGroup,
+                                groupName[0],
+                                groupId,
+                                (Long) dataSnapshot.child("lastTimestamp").getValue()
+                        )
+                    );
+
+                    referenceToGroup.child("info").child("lastTimestamp").addChildEventListener(new MyChildEventListener() {
+                        @Override
+                        public void onChildAdded(DataSnapshot dataSnapshot, String s){
+
+                        }
+
+                        @Override
+                        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                            Log.d("test", "changed! " + dataSnapshot.getValue());
+                        }
+                    });
+
+                    for (ArrayAdapter groupAdapter : groupAdapters) {
+                        groupAdapter.notifyDataSetChanged();
+                    }
+
+                    Log.d("test", "groupName = " + groupName[0]);
+
+                    final Group group = groups.get(groups.size()-1);
+
+                    group.getDatabaseReference().child("messages").addChildEventListener(new MyChildEventListener() {
+                        @Override
+                        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        group.addMessage(dataSnapshot.getValue(Message.class));
+                        for (ArrayAdapter chatAdapter : chatAdapters) {
+                            chatAdapter.notifyDataSetChanged();
+                        }
+                        //Todo: only show notification if unread and not opened
+                        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "channel")
+                            .setContentTitle("title")
+                            .setContentText("text")
+                            .setSmallIcon(R.mipmap.icon);
+                        Intent resultIntent = new Intent(context, ActivityChat.class);
+
+                        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+
+                        stackBuilder.addParentStack(ActivityChat.class);
+
+                        stackBuilder.addNextIntent(resultIntent);
+                        PendingIntent resultPendingIntent =
+                            stackBuilder.getPendingIntent(
+                                0,
+                                PendingIntent.FLAG_UPDATE_CURRENT
+                            );
+                        builder.setContentIntent(resultPendingIntent);
+
+                        NotificationManager notificationManager =
+                                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                        notificationManager.notify(0, builder.build());
+
+                        }
+                    });
+                    return;
+                }
+            });
             }
         });
     }
@@ -153,17 +176,20 @@ class DataManager {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if ( dataSnapshot.getValue() == null ) {
                     returnResult[0] = 1;
+                    Toast.makeText(context, "group does not exist", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 if ( dataSnapshot.child("members").hasChild(user.getUid())){
                     returnResult[0] = 2;
+                    Toast.makeText(context, "already in group", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 if ( dataSnapshot.hasChild("policy")
-                                && dataSnapshot.child("policy").getValue().equals("private") ){
+                                && ( (String)dataSnapshot.child("policy").getValue() ).equals("private") ){
                     returnResult[0] = 3;
+                    Toast.makeText(context, "not allowed", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -188,17 +214,23 @@ class DataManager {
     }
 
     String createGroup(String name, String userId, String policy){
-        DatabaseReference newGroupId = rootNode.child("groups").push();
+        DatabaseReference newGroupReference = rootNode.child("groups").push();
 
-        newGroupId.child("members").child(userId).setValue(1);
-        newGroupId.child("policy").setValue(policy);
-        newGroupId.child("info").child("name").setValue(name);
+        newGroupReference.child("members").child(userId).setValue(1);
+        newGroupReference.child("policy").setValue(policy);
+        newGroupReference.child("info").child("name").setValue(name);
+        newGroupReference.child("info").child("lastTimestamp").setValue(new Date().getTime());
+        pushMessage(
+                newGroupReference.getKey(),
+                new Message(user.getDisplayName()
+                        + "joined the chat", "system",
+                        new Date().getTime(), ""));
 
-        userRootNode.child("groups").child(newGroupId.getKey()).setValue(1);
+        userRootNode.child("groups").child(newGroupReference.getKey()).setValue(1);
 
-        Log.d("test", "created group: " + newGroupId.getKey() );
+        Log.d("test", "created group: " + newGroupReference.getKey() );
 
-        return newGroupId.toString();
+        return newGroupReference.toString();
     }
 
     AdapterForChats getChatAdapter(String groupId){
@@ -240,12 +272,11 @@ class DataManager {
         }
     }
 
-    void test(){
-        try{
-            Thread.currentThread().sleep(1000);
-        }
-        catch(Exception e){
-            e.printStackTrace();
+    void cleanUp(){
+        Log.d("test", "" + groups.size());
+        for (Group group : groups) {
+            Log.d("test", "group is " + group.getName());
+//            rootNode.child("groups")
         }
     }
 }

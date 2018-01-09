@@ -22,10 +22,11 @@ class Group {
         messages = new ArrayList<>();
     }
 
-    Group(DatabaseReference databaseReference, String name, String groupId){
+    Group(DatabaseReference databaseReference, String name, String groupId, long lastTimestamp){
         this.databaseReference = databaseReference;
         this.name = name;
         this.groupId = groupId;
+        this.lastTimestamp = lastTimestamp;
         messages = new ArrayList<>();
     }
 
