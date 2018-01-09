@@ -135,6 +135,10 @@ public class ActivityMain extends AppCompatActivity {
             update();
             return true;
         }
+        if (id == R.id.menu_cleanup) {
+            dataManager.cleanUp();
+            return true;
+        }
         if (id == R.id.menu_signout){
 //            DataManager.getInstance(ActivityMain.this).deleteUserData();
             if (user.isAnonymous())

@@ -57,7 +57,7 @@ public class ActivityChat extends AppCompatActivity {
     }
 
     public void sendButtonClicked(View v){
-        if (textField.getText().toString().equals("")) {
+        if (textField.getText().toString().trim().equals("")) {
             return;
         }
         dataManager.pushMessage(groupId, new Message(textField.getText().toString(), user.getUid(), new Date().getTime(), user.getDisplayName()));

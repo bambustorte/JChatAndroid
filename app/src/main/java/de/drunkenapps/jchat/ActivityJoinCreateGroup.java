@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -45,8 +46,11 @@ public class ActivityJoinCreateGroup extends AppCompatActivity {
     }
 
     public void buttonClicked(View v){
-        if (intent == null)
+        if (intent == null) {
+            Toast.makeText(this, "something went wrong...", Toast.LENGTH_LONG).show();//Fixme
+            finish();
             return;
+        }
 
         editTextText = groupName.getText().toString();
 
@@ -56,7 +60,12 @@ public class ActivityJoinCreateGroup extends AppCompatActivity {
             return;
         }
 
-        DataManager.getInstance(ActivityJoinCreateGroup.this).createGroup(editTextText, userId, "public");
-        finish();
+        if (type == 2) {
+            DataManager.getInstance(ActivityJoinCreateGroup.this).createGroup(editTextText, userId, "public");
+            finish();
+            return;
+        }
+
+        //Idea: add private group chat or chat with 2 persons (in a group, but without ability to add people)
     }
 }
