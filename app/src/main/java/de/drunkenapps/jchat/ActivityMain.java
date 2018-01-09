@@ -18,10 +18,16 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class ActivityMain extends AppCompatActivity {
+
+    static {
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+    }
 
     FirebaseAuth auth = FirebaseAuth.getInstance();
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -71,7 +77,6 @@ public class ActivityMain extends AppCompatActivity {
                 .show();
             }
         });
-        fab.setVisibility(View.INVISIBLE);
 
         dataManager = DataManager.getInstance(this);
         groupsOverview = findViewById(R.id.chats_overview_listview);

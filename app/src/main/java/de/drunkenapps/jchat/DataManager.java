@@ -103,6 +103,10 @@ class DataManager {
                                     )
                             );
 
+                            for (ArrayAdapter groupAdapter : groupAdapters) {
+                                groupAdapter.notifyDataSetChanged();
+                            }
+
                             Log.d("test", "groupName = " + groupName[0]);
 
                             final Group group = groups.get(groups.size()-1);
@@ -111,8 +115,7 @@ class DataManager {
                                 @Override
                                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                                     group.addMessage(dataSnapshot.getValue(Message.class));
-                                    for (ArrayAdapter chatAdapter :
-                                            chatAdapters) {
+                                    for (ArrayAdapter chatAdapter : chatAdapters) {
                                         chatAdapter.notifyDataSetChanged();
                                     }
                                     new Notification.Builder(context)
